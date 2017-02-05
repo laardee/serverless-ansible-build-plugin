@@ -17,4 +17,17 @@ custom:
     region: "{{ region }}"
     stage: "{{ stage }}"
     artifactPath: "{{ artifact_path }}"
+    environment:
+      SECRET: "{{ secret }}"
+
+```
+
+To overwrite Lambda environmental variables defined in Serverless service provider, one option is to define those in custom ansible environment and use in provider environment:
+
+```
+provider:
+  name: aws
+  runtime: nodejs4.3
+  environment:
+    SECRET: ${env:SECRET, self:custom.ansible.environment.SECRET}
 ```
