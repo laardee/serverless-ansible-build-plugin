@@ -43,50 +43,52 @@ class AnsibleBuild {
   }
 
   createArtifacts() {
-    const stack =
-      JSON.parse(fse.readFileSync(path.join('.serverless', 'cloudformation-template-update-stack.json'), 'utf8'));
+    if (this.options.ansible) {
+      const stack =
+        JSON.parse(fse.readFileSync(path.join('.serverless', 'cloudformation-template-update-stack.json'), 'utf8'));
 
-    delete stack.Resources.ServerlessDeploymentBucket;
-    const serviceName = this.serverless.service.service;
+      delete stack.Resources.ServerlessDeploymentBucket;
+      const serviceName = this.serverless.service.service;
 
-    const replacer = (key, value) => {
-      if (typeof (value) === 'string') {
-        const ansibleStage = this.ansible.stage || '{{ stage }}';
-        const ansibleRegion = this.ansible.region || '{{ region }}';
-        const ansibleArtifact = this.ansible.artifactPath || '{{ artifact_path }}';
-        const regexStage = new RegExp(this.options.stage, 'g');
-        const regexRegion = new RegExp(this.options.region, 'g');
-        const regexArtifact = new RegExp(`serverless/${serviceName}/${ansibleStage}/[0-9-T:.Z]+/${serviceName}.zip`, 'g');
-        // shorter (serverless\/${serviceName})(.*)(${serviceName}\.zip)
-        return value.replace(regexStage, ansibleStage)
-          .replace(regexRegion, ansibleRegion)
-          .replace(regexArtifact, `${ansibleArtifact}/${serviceName}.zip`);
-      }
-      return value;
-    };
+      const replacer = (key, value) => {
+        if (typeof (value) === 'string') {
+          const ansibleStage = this.ansible.stage || '{{ stage }}';
+          const ansibleRegion = this.ansible.region || '{{ region }}';
+          const ansibleArtifact = this.ansible.artifactPath || '{{ artifact_path }}';
+          const regexStage = new RegExp(this.options.stage, 'g');
+          const regexRegion = new RegExp(this.options.region, 'g');
+          const regexArtifact = new RegExp(`serverless/${serviceName}/${ansibleStage}/[0-9-T:.Z]+/${serviceName}.zip`, 'g');
+          // shorter (serverless\/${serviceName})(.*)(${serviceName}\.zip)
+          return value.replace(regexStage, ansibleStage)
+            .replace(regexRegion, ansibleRegion)
+            .replace(regexArtifact, `${ansibleArtifact}/${serviceName}.zip`);
+        }
+        return value;
+      };
 
-    const ansibleDir = this.ansible.buildDirectory || '.ansible';
-    const templatePath = path.join(ansibleDir, `${serviceName}.json.j2`);
+      const ansibleDir = this.ansible.buildDirectory || '.ansible';
+      const templatePath = path.join(ansibleDir, `${serviceName}.json.j2`);
 
-    // Create ansible deployment directory
-    fse.mkdirsSync(ansibleDir);
+      // Create ansible deployment directory
+      fse.mkdirsSync(ansibleDir);
 
-    // Save template
-    const template = JSON.stringify(stack, replacer, 2);
-    fse.writeFileSync(templatePath, template);
-    this.log(`Created ansible template ${templatePath}`);
+      // Save template
+      const template = JSON.stringify(stack, replacer, 2);
+      fse.writeFileSync(templatePath, template);
+      this.log(`Created ansible template ${templatePath}`);
 
-    // Copy zip
-    fse.copySync(
-      path.join('.serverless', `${serviceName}.zip`),
-      path.join(ansibleDir, `${serviceName}.zip`));
-    this.log(`Copied zip ./.serverless/${serviceName}.zip to ${ansibleDir}/${serviceName}.zip`);
+      // Copy zip
+      fse.copySync(
+        path.join('.serverless', `${serviceName}.zip`),
+        path.join(ansibleDir, `${serviceName}.zip`));
+      this.log(`Copied zip ./.serverless/${serviceName}.zip to ${ansibleDir}/${serviceName}.zip`);
 
-    // Clean .serverless folder
-    fse.removeSync(path.join('.serverless', 'cloudformation-template-create-stack.json'));
-    fse.removeSync(path.join('.serverless', 'cloudformation-template-update-stack.json'));
-    fse.removeSync(path.join('.serverless', `${serviceName}.zip`));
-    this.log('Cleaned .serverless directory');
+      // Clean .serverless folder
+      fse.removeSync(path.join('.serverless', 'cloudformation-template-create-stack.json'));
+      fse.removeSync(path.join('.serverless', 'cloudformation-template-update-stack.json'));
+      fse.removeSync(path.join('.serverless', `${serviceName}.zip`));
+      this.log('Cleaned .serverless directory');
+    }
   }
 
   log(message) {
