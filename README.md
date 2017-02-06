@@ -1,5 +1,12 @@
 # Serverless Ansible Build Plugin
 
+
+Plugin hooks to deploy command and is executed with `--ansible` flog.
+
+```
+sls deploy --ansible
+```
+
 serverless.yml
 ```
 plugins:
