@@ -48,6 +48,15 @@ class AnsibleBuild {
         JSON.parse(fse.readFileSync(path.join('.serverless', 'cloudformation-template-update-stack.json'), 'utf8'));
 
       delete stack.Resources.ServerlessDeploymentBucket;
+
+      const ServerlessDeploymentBucket = {
+        Type: 'String',
+        Description: 'Deployment Bucket Name',
+      };
+
+      // @todo check if parameters exists
+      Object.assign(stack, { Parameters: { ServerlessDeploymentBucket } });
+
       const serviceName = this.serverless.service.service;
 
       const replacer = (key, value) => {
