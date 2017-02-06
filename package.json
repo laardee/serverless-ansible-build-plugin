@@ -1,10 +1,14 @@
 {
   "name": "serverless-ansible-build-plugin",
-  "description": "Serverless Framework Plugin that creates j2 template for Ansible playbook",
-  "version": "0.1.0",
+  "description": "Serverless Framework Plugin that creates Jinja2 template for Ansible playbook",
+  "version": "0.1.1",
   "main": "index.js",
   "author": "Eetu Tuomala",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/laardee/serverless-ansible-build-plugin.git"
+  },
   "dependencies": {
     "fs-extra": "^2.0.0",
     "uuid": "^3.0.1",
