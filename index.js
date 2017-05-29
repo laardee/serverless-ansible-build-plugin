@@ -54,8 +54,11 @@ class AnsibleBuild {
         Description: 'Deployment Bucket Name',
       };
 
-      // @todo check if parameters exists
-      Object.assign(stack, { Parameters: { ServerlessDeploymentBucket } });
+      if (!stack.Parameters) {
+        stack.Parameters = {};
+      }
+
+      Object.assign(stack.Parameters, { ServerlessDeploymentBucket });
 
       const serviceName = this.serverless.service.service;
 
