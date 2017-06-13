@@ -20,8 +20,8 @@ class AnsibleBuild {
       this.options = Object.assign(this.options,
         {
           noDeploy: true,
-          stage: this.uuidStage,
-          region: this.uuidRegion,
+          stage: this.ansible.templateStage || this.uuidStage,
+          region: this.ansible.templateRegion || this.uuidRegion,
         });
     }
 
