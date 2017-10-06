@@ -89,17 +89,21 @@ class AnsibleBuild {
       fse.writeFileSync(templatePath, template);
       this.log(`Created ansible template ${templatePath}`);
 
-      // Copy zip
-      fse.copySync(
-        path.join('.serverless', `${serviceName}.zip`),
-        path.join(ansibleDir, `${serviceName}.zip`));
-      this.log(`Copied zip ./.serverless/${serviceName}.zip to ${ansibleDir}/${serviceName}.zip`);
-
-      // Clean .serverless folder
-      fse.removeSync(path.join('.serverless', 'cloudformation-template-create-stack.json'));
-      fse.removeSync(path.join('.serverless', 'cloudformation-template-update-stack.json'));
-      fse.removeSync(path.join('.serverless', `${serviceName}.zip`));
-      this.log('Cleaned .serverless directory');
+      Object.keys(this.serverless.service.functions).reduce((result, key) => {
+        const artifact = this.serverless.service.functions[key].package.artifact;
+        if (result.indexOf(artifact) === -1) {
+          result.push(artifact);
+        }
+        return result;
+      }, [])
+        .forEach((zipfile) => {
+          const zipfilename = path.parse(zipfile).base;
+          // Copy zip
+          fse.copySync(
+            zipfile,
+            path.join(ansibleDir, zipfilename));
+          this.log(`Copied zip ${zipfilename} to ${ansibleDir}/${zipfilename}`);
+        });
     }
   }
 
