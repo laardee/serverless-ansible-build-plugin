@@ -69,11 +69,10 @@ class AnsibleBuild {
           const ansibleArtifact = this.ansible.artifactPath || '{{ artifact_path }}';
           const regexStage = new RegExp(this.options.stage, 'g');
           const regexRegion = new RegExp(this.options.region, 'g');
-          const regexArtifact = new RegExp(`serverless/${serviceName}/${ansibleStage}/[0-9-T:.Z]+/${serviceName}.zip`, 'g');
-          // shorter (serverless\/${serviceName})(.*)(${serviceName}\.zip)
+          const regexArtifact = new RegExp(`serverless/${serviceName}/${ansibleStage}/[0-9-T:.Z]+/`, 'g');
           return value.replace(regexStage, ansibleStage)
             .replace(regexRegion, ansibleRegion)
-            .replace(regexArtifact, `${ansibleArtifact}/${serviceName}.zip`);
+            .replace(regexArtifact, `${ansibleArtifact}/`);
         }
         return value;
       };
